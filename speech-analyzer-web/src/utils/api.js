@@ -1,4 +1,19 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+let rawApiBase = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+
+// Normalize API_BASE: ensure it starts with http:// or https://, and ends with /api (without trailing slash)
+rawApiBase = rawApiBase.trim();
+if (!rawApiBase.startsWith('http://') && !rawApiBase.startsWith('https://')) {
+  rawApiBase = 'https://' + rawApiBase;
+}
+if (rawApiBase.endsWith('/')) {
+  rawApiBase = rawApiBase.slice(0, -1);
+}
+if (!rawApiBase.endsWith('/api')) {
+  rawApiBase = rawApiBase + '/api';
+}
+
+const API_BASE = rawApiBase;
+
 
 /**
  * Check if the backend models are loaded and ready.
