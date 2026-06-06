@@ -22,7 +22,7 @@ def preprocess_audio_file(file_path):
     """
     from scipy.signal import butter, filtfilt
     try:
-        y, sr = librosa.load(file_path, sr=None)
+        y, sr = sf.read(file_path)
         
         # 1. Apply High-pass filter at 80Hz (removes low-frequency microphone/room hum)
         cutoff = 80.0
@@ -200,6 +200,33 @@ def load_models():
         except Exception as we:
             print(f"[!] Warning: Failed to warm up gender model: {we}")
 
+        # Warm up librosa loader to trigger lazy-loading of audioread and other helpers
+        try:
+            print("[*] Warming up librosa loader ...")
+            dummy_path = os.path.join(GENDER_DIR, 'test-samples', '16-122828-0002.wav')
+            if os.path.exists(dummy_path):
+                import librosa as _lr
+                _lr.load(dummy_path, sr=None)
+                print("[+] librosa loader warmed up.")
+            else:
+                print("[!] Warning: Warmup WAV file not found.")
+        except Exception as le:
+            print(f"[!] Warning: Failed to warm up librosa loader: {le}")
+
+        # Warm up full pipeline (emotions & gender featurization + prediction)
+        try:
+            print("[*] Performing full prediction pipeline warmup ...")
+            dummy_path = os.path.join(GENDER_DIR, 'test-samples', '16-122828-0002.wav')
+            if os.path.exists(dummy_path):
+                _do_predict_emotion(dummy_path)
+                print("[+] Emotion prediction pipeline warmed up.")
+                _do_predict_gender(dummy_path)
+                print("[+] Gender prediction pipeline warmed up.")
+            else:
+                print("[!] Warning: Full pipeline warmup WAV file not found.")
+        except Exception as fe:
+            print(f"[!] Warning: Full pipeline warmup failed: {fe}")
+
         models_ready   = True
         models_loading = False
         print("[+] All models ready!")
@@ -213,7 +240,7 @@ def load_models():
         traceback.print_exc()
 
 
-load_models()
+
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -397,6 +424,9 @@ def diag():
     finally:
         try: os.remove(path)
         except: pass
+
+
+load_models()
 
 
 if __name__ == '__main__':
