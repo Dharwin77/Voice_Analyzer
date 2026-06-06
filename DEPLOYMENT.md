@@ -49,7 +49,7 @@ Render will host the Flask API and load scikit-learn and TensorFlow models to pe
    - **Name**: `voice-analyzer-backend`
    - **Runtime**: `Python`
    - **Build Command**: `python -m pip install --upgrade pip && pip install -r backend/requirements.txt`
-   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT --chdir backend app:app`
+   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT --timeout 120 --chdir backend app:app`
 4. Expand **Advanced** and add the following Environment Variable:
    - `PYTHON_VERSION`: `3.10.0`
 5. Click **Deploy Web Service**.

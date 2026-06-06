@@ -246,12 +246,13 @@ def _do_predict_emotion(path):
     old_cwd = os.getcwd()
     os.chdir(EMOTION_DIR)
     try:
-        emotion = emotion_recognizer.predict(path)
         proba   = {}
         try:
             proba = emotion_recognizer.predict_proba(path)
             proba = {k: round(float(v) * 100, 1) for k, v in proba.items()}
+            emotion = max(proba, key=proba.get)
         except Exception:
+            emotion = emotion_recognizer.predict(path)
             proba = {emotion: 100.0}
         return emotion, proba
     finally:
