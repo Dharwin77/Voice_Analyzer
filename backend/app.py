@@ -354,6 +354,10 @@ def diag():
     path = save_upload(request.files['audio'])
     info = {}
     try:
+        import os
+        info['file_exists'] = os.path.exists(path)
+        info['file_size'] = os.path.getsize(path) if os.path.exists(path) else -1
+
         import soundfile as sf
         info['soundfile_version'] = sf.__version__
         try:
