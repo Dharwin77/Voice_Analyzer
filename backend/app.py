@@ -347,6 +347,46 @@ def predict_both():
         except: pass
 
 
+@app.route('/api/diag', methods=['POST'])
+def diag():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file provided'}), 400
+    path = save_upload(request.files['audio'])
+    info = {}
+    try:
+        import soundfile as sf
+        info['soundfile_version'] = sf.__version__
+        try:
+            with sf.SoundFile(path) as f:
+                info['sf_read_success'] = True
+                info['sf_samplerate'] = f.samplerate
+                info['sf_channels'] = f.channels
+                info['sf_format'] = f.format
+                info['sf_subtype'] = f.subtype
+        except Exception as e:
+            import traceback
+            info['sf_read_success'] = False
+            info['sf_read_error'] = str(e)
+            info['sf_read_traceback'] = traceback.format_exc()
+            
+        try:
+            import librosa
+            y, sr = librosa.load(path, sr=None)
+            info['librosa_success'] = True
+            info['librosa_sr'] = int(sr)
+            info['librosa_shape'] = list(y.shape)
+        except Exception as e:
+            import traceback
+            info['librosa_success'] = False
+            info['librosa_error'] = str(e)
+            info['librosa_traceback'] = traceback.format_exc()
+            
+        return jsonify(info)
+    finally:
+        try: os.remove(path)
+        except: pass
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port, threaded=True)
