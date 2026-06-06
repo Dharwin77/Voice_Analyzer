@@ -1,5 +1,11 @@
 import os
 import sys
+
+# Limit TensorFlow threading to avoid CPU saturation and timeouts on shared virtual cores
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["TF_NUM_INTRAOP_THREADS"] = "1"
+os.environ["TF_NUM_INTEROP_THREADS"] = "1"
+
 import uuid
 import threading
 import numpy as np
@@ -185,11 +191,8 @@ def load_models():
         gender_model, gender_extract_fn = _load_gender_model()
         print("[+] Gender model loaded.")
 
-        # Optimize TF threads and run warmup prediction to avoid timeout on first request
+        # Run warmup prediction to avoid timeout on first request
         try:
-            import tensorflow as tf
-            tf.config.threading.set_intra_op_parallelism_threads(1)
-            tf.config.threading.set_inter_op_parallelism_threads(1)
             print("[*] Warming up Gender model ...")
             dummy_features = np.zeros((1, 128))
             gender_model.predict(dummy_features, verbose=0)
