@@ -110,8 +110,10 @@ def _load_emotion_model():
             BaggingClassifier(),
             emotions=['sad', 'neutral', 'happy'],
             balance=True,
+            override_csv=False,
             verbose=0
         )
+
         rec.train(verbose=0)
         return rec
 
