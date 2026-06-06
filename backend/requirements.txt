@@ -9,4 +9,6 @@ pandas
 numpy
 tqdm
 tensorflow-cpu
+matplotlib
 gunicorn
+
