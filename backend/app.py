@@ -191,7 +191,7 @@ def load_models():
         traceback.print_exc()
 
 
-threading.Thread(target=load_models, daemon=True).start()
+load_models()
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
