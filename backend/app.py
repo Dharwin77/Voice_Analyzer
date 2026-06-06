@@ -181,9 +181,22 @@ def load_models():
         gender_model, gender_extract_fn = _load_gender_model()
         print("[+] Gender model loaded.")
 
+        # Optimize TF threads and run warmup prediction to avoid timeout on first request
+        try:
+            import tensorflow as tf
+            tf.config.threading.set_intra_op_parallelism_threads(1)
+            tf.config.threading.set_inter_op_parallelism_threads(1)
+            print("[*] Warming up Gender model ...")
+            dummy_features = np.zeros((1, 128))
+            gender_model.predict(dummy_features, verbose=0)
+            print("[+] Gender model warmed up.")
+        except Exception as we:
+            print(f"[!] Warning: Failed to warm up gender model: {we}")
+
         models_ready   = True
         models_loading = False
         print("[+] All models ready!")
+
 
     except Exception as e:
         import traceback
@@ -264,6 +277,8 @@ def predict_emotion():
             'color': EMOTION_COLORS.get(emotion, '#a78bfa'), 'probabilities': proba
         })
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
     finally:
         try: os.remove(path)
@@ -285,6 +300,8 @@ def predict_gender():
             'male_probability': round(mp * 100, 2), 'female_probability': round(fp * 100, 2)
         })
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
     finally:
         try: os.remove(path)
@@ -322,6 +339,8 @@ def predict_both():
             }
         })
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
     finally:
         try: os.remove(path)
