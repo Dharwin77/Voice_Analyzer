@@ -55,7 +55,11 @@ GENDER_DIR  = os.path.normpath(os.path.join(BASE_DIR, '..', 'gender-recognition-
 app = Flask(__name__)
 CORS(app, origins="*")
 
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+# Use /tmp on Linux/Render to bypass AppArmor sandbox constraints for libsndfile, fallback to local uploads on Windows
+if os.name == 'nt':
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+else:
+    UPLOAD_FOLDER = '/tmp'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024
 
