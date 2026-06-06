@@ -1,0 +1,12 @@
+flask==2.3.3
+flask-cors==4.0.0
+werkzeug==2.3.7
+scikit-learn>=0.24.2
+librosa>=0.10.0
+soundfile
+scipy
+pandas
+numpy
+tqdm
+tensorflow-cpu
+gunicorn

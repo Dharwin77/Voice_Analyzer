@@ -1,0 +1,22 @@
+services:
+  # 1. Flask Python Backend Service
+  - type: web
+    name: voice-analyzer-backend
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --chdir backend app:app
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: PYTHON_VERSION
+        value: 3.10.0
+
+  # 2. React static frontend (Alternative to Vercel hosting)
+  - type: web
+    name: voice-analyzer-frontend
+    env: static
+    buildCommand: cd speech-analyzer-web && npm install && npm run build
+    staticPublishPath: speech-analyzer-web/dist
+    headers:
+      - key: Cache-Control
+        value: public, max-age=31536000, immutable

@@ -1,0 +1,46 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_resources/
+
+# Build artifacts
+dist/
+build/
+.gemini/
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Dataset raw audio and features (not needed in production)
+**/data/
+**/logs/
+backend/uploads/*.wav
+backend/uploads/debug_audio.wav
+
+# Large Gender Recognition training features (only results/model.h5 is needed for inference)
+gender-recognition-by-voice-master/results/features.npy
+gender-recognition-by-voice-master/results/labels.npy
+
+# Environment configuration files
+.env
+.env.local
+.env.*.local
+
+# IDEs & System files
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+Thumbs.db

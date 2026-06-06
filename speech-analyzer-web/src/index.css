@@ -1,0 +1,664 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ── Retro-Futuristic Design Tokens ─────────────────────────────────────────── */
+:root {
+  --bg-void:        #06060c;
+  --bg-metal:       #12141d;
+  --panel-bg:       #1a1d2c;
+  --panel-border:   #2e334a;
+  --panel-screws:   #4a5275;
+
+  /* Phosphor glows */
+  --phosphor-green:  #33ff66;
+  --phosphor-amber:  #ffb000;
+  --phosphor-cyan:   #00e5ff;
+  --phosphor-pink:   #ff2a85;
+  --phosphor-red:    #ff3b30;
+
+  --glow-green:      0 0 15px rgba(51, 255, 102, 0.5), 0 0 30px rgba(51, 255, 102, 0.2);
+  --glow-amber:      0 0 15px rgba(255, 176, 0, 0.5), 0 0 30px rgba(255, 176, 0, 0.2);
+  --glow-cyan:       0 0 15px rgba(0, 229, 255, 0.5), 0 0 30px rgba(0, 229, 255, 0.2);
+  --glow-pink:       0 0 15px rgba(255, 42, 133, 0.5), 0 0 30px rgba(255, 42, 133, 0.2);
+  --glow-red:        0 0 15px rgba(255, 59, 48, 0.6), 0 0 30px rgba(255, 59, 48, 0.3);
+
+  --text-bright:     #f4f6fb;
+  --text-green:      #5fff82;
+  --text-amber:      #ffc44d;
+  --text-dim:        #858ca3;
+
+  --radius-panel:    12px;
+  --radius-bezel:    6px;
+  --radius-full:     9999px;
+
+  --transition-tactile: 100ms cubic-bezier(0.25, 0.8, 0.25, 1);
+  --transition-smooth:  300ms cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ── Base Reset ────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-bright);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Scanline and CRT Simulation Overlay ─────────────────────────────────────── */
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 9999;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* ── Scrollbars ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-void); }
+::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--panel-screws); }
+
+/* ── Animations ────────────────────────────────────────────────────────────── */
+@keyframes crt-sweep {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes spin-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-counter-clockwise {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes nixie-flicker {
+  0%, 100% { opacity: 0.95; }
+  45% { opacity: 1; }
+  50% { opacity: 0.85; }
+  55% { opacity: 0.98; }
+  85% { opacity: 0.90; }
+  90% { opacity: 0.75; }
+}
+
+@keyframes led-blink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; filter: drop-shadow(0 0 5px var(--phosphor-red)); }
+}
+
+@keyframes dial-needle-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1deg); }
+  75% { transform: rotate(-1deg); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes flip-up {
+  0% { transform: rotateX(-90deg); opacity: 0; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
+
+/* ── Modular Metal Console Panel ─────────────────────────────────────────────── */
+.console-panel {
+  background: var(--panel-bg);
+  border: 3px solid var(--panel-border);
+  border-radius: var(--radius-panel);
+  position: relative;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+
+/* Panel Screws on 4 corners */
+.console-panel::before {
+  content: "⚙";
+  position: absolute;
+  top: 8px; left: 8px;
+  color: var(--panel-screws);
+  font-size: 12px;
+  transform: rotate(15deg);
+  pointer-events: none;
+}
+.console-panel::after {
+  content: "⚙";
+  position: absolute;
+  top: 8px; right: 8px;
+  color: var(--panel-screws);
+  font-size: 12px;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.panel-bottom-screws {
+  position: absolute;
+  bottom: 8px; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--panel-screws);
+  pointer-events: none;
+}
+
+/* ── Glowing CRT Terminal Bezels ────────────────────────────────────────────── */
+.crt-bezel {
+  background: #090a0f;
+  border: 4px solid #1c1f2e;
+  border-radius: var(--radius-bezel);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-bezel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.4) 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Typography & Glowing Digital Displays ────────────────────────────────────── */
+.monospace-terminal {
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  color: var(--text-green);
+  text-shadow: var(--glow-green);
+}
+
+.nixie-display {
+  font-family: 'Orbitron', monospace;
+  color: var(--phosphor-amber);
+  text-shadow: var(--glow-amber);
+  animation: nixie-flicker 5s infinite;
+}
+
+.nixie-pink {
+  color: var(--phosphor-pink);
+  text-shadow: var(--glow-pink);
+}
+
+.nixie-cyan {
+  color: var(--phosphor-cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+/* ── Tactile Knobs & Toggles ─────────────────────────────────────────────────── */
+.analog-knob-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.analog-knob {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #3e4460 0%, #1a1d2c 80%, #0d0e16 100%);
+  border: 3px solid #2e334a;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 2px 3px rgba(255,255,255,0.1);
+  position: relative;
+  cursor: pointer;
+  transition: transform var(--transition-tactile);
+}
+
+.analog-knob::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 16px;
+  background: var(--phosphor-amber);
+  box-shadow: var(--glow-amber);
+  top: 4px;
+  left: calc(50% - 2px);
+  border-radius: 2px;
+}
+
+.analog-knob:hover {
+  border-color: var(--panel-screws);
+}
+
+.knob-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* Tactile Push-Buttons */
+.push-button {
+  background: linear-gradient(to bottom, #4f587a 0%, #2b3046 100%);
+  border: 2px solid #5a648c;
+  border-bottom: 5px solid #1a1e2d;
+  color: white;
+  border-radius: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+  transition: all var(--transition-tactile);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.push-button:hover {
+  background: linear-gradient(to bottom, #5f6a94 0%, #353b57 100%);
+  border-color: #6d7ab0;
+}
+
+.push-button:active {
+  transform: translateY(3px);
+  border-bottom-width: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.push-button.btn-amber {
+  background: linear-gradient(to bottom, #ffc83b 0%, #cc8800 100%);
+  border-color: #ffdd80;
+  border-bottom-color: #7f5500;
+  color: #1e1300;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.push-button.btn-amber:hover {
+  background: linear-gradient(to bottom, #ffd15c 0%, #e69900 100%);
+}
+
+.push-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  border-bottom-width: 5px !important;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5) !important;
+}
+
+/* Power toggle switch */
+.switch-toggle {
+  position: relative;
+  width: 44px;
+  height: 72px;
+  background: #0f1017;
+  border-radius: 6px;
+  border: 2px solid #2e334a;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.switch-toggle-handle {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(to bottom, #d5d9e8 0%, #858da8 100%);
+  border: 2px solid #edf0f7;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 2px 2px white;
+  left: 4px;
+  top: 4px;
+  transition: top 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.switch-toggle.active .switch-toggle-handle {
+  top: 32px;
+  background: linear-gradient(to bottom, #ff9e00 0%, #e06000 100%);
+  border-color: #ffcc80;
+  box-shadow: 0 -4px 6px rgba(0,0,0,0.5), 0 0 10px rgba(255, 120, 0, 0.4);
+}
+
+/* LED Indicators */
+.led-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3a1a1a;
+  border: 2px solid #1a0a0a;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.led-indicator.led-green.active {
+  background: var(--phosphor-green);
+  border-color: #d1ffd1;
+  box-shadow: var(--glow-green), inset 0 1px 2px white;
+}
+
+.led-indicator.led-amber.active {
+  background: var(--phosphor-amber);
+  border-color: #ffe6b3;
+  box-shadow: var(--glow-amber), inset 0 1px 2px white;
+}
+
+.led-indicator.led-red.active {
+  background: var(--phosphor-red);
+  border-color: #ffd2d2;
+  box-shadow: var(--glow-red), inset 0 1px 2px white;
+  animation: led-blink 1s infinite;
+}
+
+/* ── Spinning Tape Reels (Cassette Deck effect) ────────────────────────────── */
+.cassette-window {
+  width: 240px;
+  height: 110px;
+  background: #090a0f;
+  border: 4px solid #2e334a;
+  border-radius: var(--radius-bezel);
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+}
+
+.cassette-window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 50%, transparent 50%);
+  pointer-events: none;
+}
+
+.tape-reel {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 4px dashed var(--panel-screws);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tape-reel::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2e334a;
+  position: absolute;
+}
+
+.tape-reel::after {
+  content: "";
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px dotted var(--text-dim);
+}
+
+.tape-reel.spinning {
+  animation: spin-clockwise 2s linear infinite;
+}
+
+.tape-reel.spinning-reverse {
+  animation: spin-counter-clockwise 2s linear infinite;
+}
+
+.tape-ribbon {
+  position: absolute;
+  width: 140px;
+  height: 6px;
+  background: #222;
+  top: calc(50% - 3px);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+/* ── Split Flap character blocks ────────────────────────────────────────────── */
+.split-flap-group {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.split-flap-char {
+  background: linear-gradient(to bottom, #111 0%, #1c1d24 48%, #000 50%, #121319 100%);
+  border: 1px solid #333;
+  border-radius: 4px;
+  width: 44px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--phosphor-amber);
+  text-shadow: var(--glow-amber);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+  animation: flip-up 0.15s ease both;
+}
+
+.split-flap-char::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: rgba(0,0,0,0.7);
+  top: 50%;
+}
+
+/* ── Analog Radar Sweep vectorscope ─────────────────────────────────────────── */
+.radar-grid {
+  position: relative;
+  background: radial-gradient(circle, #0a1f11 0%, #030a05 100%);
+  border: 3px solid #204028;
+  border-radius: 50%;
+  box-shadow: inset 0 0 20px rgba(0,255,100,0.2), 0 0 10px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+.radar-sweep-beam {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: conic-gradient(from 0deg, rgba(51, 255, 102, 0.4) 0deg, transparent 90deg, transparent 360deg);
+  border-radius: 50%;
+  transform-origin: center;
+  animation: spin-clockwise 4s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Vintage VU Meters ───────────────────────────────────────────────────────── */
+.vu-meter-panel {
+  background: #faf6ee;
+  border: 4px solid #1a1c24;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  height: 110px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.vu-meter-scale {
+  position: absolute;
+  top: 10px; left: 10px; right: 10px;
+  height: 50px;
+  border-bottom: 2px solid #222;
+  border-radius: 0 0 50% 50% / 0 0 10px 10px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-family: monospace;
+  font-size: 8px;
+  color: #333;
+}
+
+.vu-needle {
+  position: absolute;
+  width: 2px;
+  height: 80px;
+  background: #ff3b30;
+  left: calc(50% - 1px);
+  bottom: -10px;
+  transform-origin: bottom center;
+  transform: rotate(-45deg);
+  transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.vu-needle::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #111;
+  border-radius: 50%;
+  bottom: 0;
+  left: -5px;
+}
+
+.vu-label {
+  position: absolute;
+  bottom: 8px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #222;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.15em;
+}
+
+/* ── Content Grid Layouts ────────────────────────────────────────────────────── */
+.console-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+@media (max-width: 900px) {
+  .console-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rack-mount {
+  border: 4px double var(--panel-border);
+  border-radius: var(--radius-panel);
+  padding: 2px;
+  background: #0d0f17;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* ── Ribbon grid patterns for BG ────────────────────────────────────────────── */
+.blueprint-grid {
+  position: fixed;
+  inset: 0;
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(51, 255, 102, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(51, 255, 102, 0.03) 1px, transparent 1px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.blueprint-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 30%, rgba(6,6,12,0.8) 100%);
+}
+
+.particle-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+}
+
+/* ── Custom CRT sweeping phosphor bar ────────────────────────────────────────── */
+.crt-sweep-line {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: rgba(51, 255, 102, 0.2);
+  box-shadow: 0 0 10px rgba(51, 255, 102, 0.5);
+  top: 0; left: 0;
+  pointer-events: none;
+  animation: crt-sweep 6s linear infinite;
+  z-index: 5;
+}
+
+/* ── App Layout ────────────────────────────────────────────────────────────── */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 40px;
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    padding: 0 16px;
+  }
+}
+
+.app-title-card {
+  text-align: center;
+  padding: 32px 0;
+  border-bottom: 2px solid var(--panel-border);
+  margin-bottom: 32px;
+}
+
+.console-bezel-leds {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.meter-scale-markers {
+  width: 100%;
+  height: 6px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.marker {
+  width: 1px;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+}
+
+.marker.long {
+  height: 6px;
+  background: rgba(255,255,255,0.6);
+}
