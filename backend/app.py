@@ -313,8 +313,9 @@ def predict_emotion():
         })
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        tb = traceback.format_exc()
+        print(tb)
+        return jsonify({'error': str(e), 'traceback': tb}), 200
     finally:
         try: os.remove(path)
         except: pass
@@ -336,8 +337,9 @@ def predict_gender():
         })
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        tb = traceback.format_exc()
+        print(tb)
+        return jsonify({'error': str(e), 'traceback': tb}), 200
     finally:
         try: os.remove(path)
         except: pass
@@ -375,8 +377,9 @@ def predict_both():
         })
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        tb = traceback.format_exc()
+        print(tb)
+        return jsonify({'error': str(e), 'traceback': tb}), 200
     finally:
         try: os.remove(path)
         except: pass
